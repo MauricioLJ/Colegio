@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Notas de Estudiante</title>
+    <link href='https://fonts.googleapis.com/css?family=Titillium+Web:400,300,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="form">
+        <div id="signup">
+            <h1 id="registrese_header">Registrese</h1>
+
+            <form id="registration-form">
+                <div class="field-wrap">
+                    <label>Nombre<span class="req">*</span></label>
+                    <input type="text" id="nombre" required autocomplete="off" />
+                </div>
+
+                <div class="top-row">
+                    <div class="field-wrap">
+                        <label>Primer apellido<span class="req">*</span></label>
+                        <input type="text" id="primer_apellido" required autocomplete="off" />
+                    </div>
+                    <div class="field-wrap">
+                        <label>Segundo apellido<span class="req">*</span></label>
+                        <input type="text" id="segundo_apellido" required autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="field-wrap">
+                    <label id="date">Fecha de nacimiento<span class="req">*</span></label>
+                    <input type="date" required autocomplete="off" min="2007-01-01" max="2013-01-01" />
+                </div>
+
+                <div class="field-wrap">
+                    <label>Nombre Materia<span class="req">*</span></label>
+                    <input type="text" id="nombre_materia" required autocomplete="off" />
+                </div>
+
+                <div class="field-wrap">
+                    <label>Tipo de Materia<span class="req">*</span></label>
+                    <input type="text" id="tipo_materia" required autocomplete="off" />
+                </div>
+
+                <div class="field-wrap">
+                    <label>Nota<span class="req">*</span></label>
+                    <input type="number" required autocomplete="off" min="0" max="100" />
+                </div>
+
+                <button id="register" class="button button-block">Guardar</button>
+            </form>
+
+            <div id="success-message" style="display:none; color:green; font-weight:bold;">
+                Estudiante registrado exitosamente.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("registration-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const estudiante = {
+                nombre: document.getElementById("nombre").value.trim(),
+                primer_apellido: document.getElementById("primer_apellido").value.trim(),
+                segundo_apellido: document.getElementById("segundo_apellido").value.trim(),
+                nota: parseInt(document.querySelector('input[type="number"]').value, 10),
+                estado: "Activo",
+                fecha_nacimiento: document.querySelector('input[type="date"]').value
+            };
+
+
+            const materia = {
+                id_estudiante: 0,
+                nombre_materia: document.getElementById("nombre_materia").value.trim(),
+                tipo_materia: document.getElementById("tipo_materia").value.trim(),
+                nota: parseInt(document.querySelector('input[type="number"]').value, 10)
+            };
+
+            const payload = {
+                estudiante: estudiante,
+                materia: materia
+            };
+
+            fetch("http://localhost:8080/api/register/registerNew", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Error en la solicitud");
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Respuesta del backend:", data);
+                    document.getElementById("registration-form").style.display = "none";
+                    document.getElementById("registrese_header").style.display = "none";
+                    const msgDiv = document.getElementById("success-message");
+                    msgDiv.style.display = "block";
+                    msgDiv.textContent = "Estudiante registrado exitosamente.";
+                    msgDiv.style.textAlign = "center";
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Hubo un error en la llamada.");
+                });
+        });
+
+    </script>
+    
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.form').find('input, textarea').on('keyup blur focus', function (e) {
+                var $this = $(this),
+                    label = $this.prev('label');
+
+                if (e.type === 'keyup') {
+                    if ($this.val() === '') {
+                        label.removeClass('active highlight');
+                    } else {
+                        label.addClass('active highlight');
+                    }
+                } else if (e.type === 'blur') {
+                    if ($this.val() === '') {
+                        label.removeClass('active highlight');
+                    } else {
+                        label.removeClass('highlight');
+                    }
+                } else if (e.type === 'focus') {
+                    if ($this.val() === '') {
+                        label.removeClass('highlight');
+                    } else {
+                        label.addClass('highlight');
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
