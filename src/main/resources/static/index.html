@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login & Register</title>
+    <link href='https://fonts.googleapis.com/css?family=Titillium+Web:400,300,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="form">
+        <div id="signup">
+            <h1>Registrese</h1>
+
+            <form id="registration-form">
+                <!-- Campos para estudiante -->
+                <div class="field-wrap">
+                    <label>Nombre<span class="req">*</span></label>
+                    <input type="text" id="nombre" required autocomplete="off" />
+                </div>
+
+                <div class="top-row">
+                    <div class="field-wrap">
+                        <label>Primer apellido<span class="req">*</span></label>
+                        <input type="text" id="primer_apellido" required autocomplete="off" />
+                    </div>
+                    <div class="field-wrap">
+                        <label>Segundo apellido<span class="req">*</span></label>
+                        <input type="text" id="segundo_apellido" required autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="field-wrap">
+                    <label id="date">Fecha de nacimiento<span class="req">*</span></label>
+                    <input type="date" required autocomplete="off" min="2007-01-01" max="2013-01-01" />
+                </div>
+
+                <!-- Campos para materia -->
+                <div class="field-wrap">
+                    <label>Nombre Materia<span class="req">*</span></label>
+                    <input type="text" id="nombre_materia" required autocomplete="off" />
+                </div>
+
+                <div class="field-wrap">
+                    <label>Tipo de Materia<span class="req">*</span></label>
+                    <input type="text" id="tipo_materia" required autocomplete="off" />
+                </div>
+
+                <div class="field-wrap">
+                    <label>Nota<span class="req">*</span></label>
+                    <input type="number" required autocomplete="off" min="0" max="100" />
+                </div>
+
+                <button id="register" type="submit" class="button button-block" onclick="">Submit</button>
+            </form>
+
+            <p id="response-message"></p>
+        </div>
+    </div>
+
+
+    <script>
+        const button = document.getElementById('register');
+        button.addEventListener('click', function () {
+            fetch('http://localhost:8080/api/register/registerNew', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Mostrar la respuesta del servidor
+                    document.getElementById("response-message").innerText = data;
+                })
+                .catch(error => {
+                    console.error("Error al registrar:", error);
+                });
+        });
+
+
+    </script>
+
+    <script>
+        function enviarFormulario(event) {
+            const inputs = document.querySelectorAll('.form input, .form textarea');
+            inputs.forEach(input => input.value = '');
+            event.preventDefault();
+            console.log("Datos enviados");
+        }
+    </script>
+
+    <script>
+        document.getElementById("registration-form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            // Recoger los datos del formulario para el Estudiante
+            const estudiante = {
+                nombre: document.getElementById("nombre").value,
+                primer_apellido: document.getElementById("primer_apellido").value,
+                segundo_apellido: document.getElementById("segundo_apellido").value,
+                fecha_nacimiento: document.getElementById("fecha_nacimiento").value,
+                estado: "Activo",
+                nota: parseInt(document.getElementById("nota").value)
+            };
+
+            // Recoger los datos de la materia
+            const materia = {
+                nombre_materia: document.getElementById("nombre_materia").value,
+                tipo_materia: document.getElementById("tipo_materia").value,
+                nota: parseInt(document.getElementById("nota").value)
+            };
+
+            // Crear el objeto request que contiene tanto estudiante como materia
+            const request = {
+                estudiante: estudiante,
+                estudianteMateria: materia
+            };
+
+
+            fetch('http://localhost:8080/api/register/registerNew', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Mostrar la respuesta del servidor
+                    document.getElementById("response-message").innerText = data;
+                })
+                .catch(error => {
+                    console.error("Error al registrar:", error);
+                });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.form').find('input, textarea').on('keyup blur focus', function (e) {
+                var $this = $(this),
+                    label = $this.prev('label');
+
+                if (e.type === 'keyup') {
+                    if ($this.val() === '') {
+                        label.removeClass('active highlight');
+                    } else {
+                        label.addClass('active highlight');
+                    }
+                } else if (e.type === 'blur') {
+                    if ($this.val() === '') {
+                        label.removeClass('active highlight');
+                    } else {
+                        label.removeClass('highlight');
+                    }
+                } else if (e.type === 'focus') {
+                    if ($this.val() === '') {
+                        label.removeClass('highlight');
+                    } else {
+                        label.addClass('highlight');
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
