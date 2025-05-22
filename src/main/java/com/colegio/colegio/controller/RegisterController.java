@@ -3,6 +3,8 @@ package com.colegio.colegio.controller;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,48 +19,47 @@ import com.colegio.colegio.service.RegisterService;
 @RequestMapping("/api/register")
 public class RegisterController {
 
-    @Autowired
-    private RegisterService registerService;
+        private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
 
-    RegisterController(RegisterService registerService) {
-        this.registerService = registerService;
-    }
+        private final RegisterService registerService;
 
-    @PostMapping("/registerNew")
-    public Map<String, String> register(@RequestBody Map<String, Object> request) {
-        // Extraer los datos del estudiante y materia desde el Map
-        Map<String, Object> estudianteData = (Map<String, Object>) request.get("estudiante");
-        Map<String, Object> materiaData = (Map<String, Object>) request.get("materia");
+        public RegisterController(RegisterService registerService) {
+                this.registerService = registerService;
+        }
 
-        // Crear las entidades a partir de los datos del Map
-        estudiantes estudiante = new estudiantes(
-                null, // ID autogenerado por la base de datos
-                (String) estudianteData.get("nombre"),
-                (String) estudianteData.get("primer_apellido"),
-                (String) estudianteData.get("segundo_apellido"),
-                (Integer) estudianteData.get("nota"),
-                (String) estudianteData.get("estado"),
-                (String) estudianteData.get("fecha_nacimiento"));
+        @PostMapping("/registerNew")
+        public Map<String, String> register(@RequestBody Map<String, Object> request) {
+                Map<String, Object> estudianteData = (Map<String, Object>) request.get("estudiante");
+                Map<String, Object> materiaData = (Map<String, Object>) request.get("materia");
 
-        estudiantes_materias materia = new estudiantes_materias(
-                null, // ID autogenerado
-                (Integer) materiaData.get("id_estudiante"), // ID de estudiante
-                (String) materiaData.get("nombre_materia"),
-                (String) materiaData.get("tipo_materia"),
-                (Integer) materiaData.get("nota"));
+                estudiantes estudiante = new estudiantes(
+                                null,
+                                (String) estudianteData.get("nombre"),
+                                (String) estudianteData.get("primer_apellido"),
+                                (String) estudianteData.get("segundo_apellido"),
+                                (Integer) estudianteData.get("nota"),
+                                (String) estudianteData.get("estado"),
+                                (String) estudianteData.get("fecha_nacimiento"));
 
-        registerService.registerStudent(estudiante);
-        registerService.registerSubject(materia);
+                estudiantes_materias materia = new estudiantes_materias(
+                                null,
+                                (Integer) materiaData.get("id_estudiante"),
+                                (String) materiaData.get("nombre_materia"),
+                                (String) materiaData.get("tipo_materia"),
+                                (Integer) materiaData.get("nota"));
 
-        Map<String, String> response = new LinkedHashMap<>();
-        response.put("mensajeEstudiante", "Estudiante registrado con éxito: " +
-                (String) estudianteData.get("nombre") + " " +
-                (String) estudianteData.get("primer_apellido") + " " +
-                (String) estudianteData.get("segundo_apellido"));
-        response.put("mensajeMateria", "Materia registrada con éxito: " +
-                materia.getNombre_materia() + " " + materia.getTipo_materia());
+                registerService.registerStudent(estudiante);
+                registerService.registerSubject(materia);
 
-        return response;
-    }
+                Map<String, String> response = new LinkedHashMap<>();
+                response.put("mensajeEstudiante", "Estudiante registrado con éxito: " +
+                                (String) estudianteData.get("nombre") + " " +
+                                (String) estudianteData.get("primer_apellido") + " " +
+                                (String) estudianteData.get("segundo_apellido"));
+                response.put("mensajeMateria", "Materia registrada con éxito: " +
+                                materia.getNombre_materia() + " " + materia.getTipo_materia());
+
+                return response;
+        }
 
 }

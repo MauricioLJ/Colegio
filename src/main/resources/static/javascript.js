@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(result => {
             alert("✅ " + result.mensajeEstudiante + "\n📘 " + result.mensajeMateria);
-            form.reset(); // Limpia el formulario
+            form.reset(); 
         })
         .catch(error => {
             console.error("Error:", error);

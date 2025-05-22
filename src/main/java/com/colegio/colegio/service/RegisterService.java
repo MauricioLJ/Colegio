@@ -1,6 +1,7 @@
 package com.colegio.colegio.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,26 +14,40 @@ import com.colegio.colegio.repository.MateriaRepository;
 @Transactional
 public class RegisterService {
 
-    @Autowired
-    private EstudianteRepository estudianteRepository;
+    private static final Logger logger = LoggerFactory.getLogger(RegisterService.class);
 
-    @Autowired
-    private MateriaRepository materiaRepository;
+    private final EstudianteRepository estudianteRepository;
+    private final MateriaRepository materiaRepository;
+
+    public RegisterService(EstudianteRepository estudianteRepository, MateriaRepository materiaRepository) {
+        this.estudianteRepository = estudianteRepository;
+        this.materiaRepository = materiaRepository;
+    }
 
     public String registerStudent(estudiantes estudiante) {
-
-        estudianteRepository.save(estudiante);
-
-        return "Estudiante registrado con exito: " + estudiante.getNombre() + " " + estudiante.getPrimer_apellido()
-                + " " + estudiante.getSegundo_apellido();
+        try {
+            estudianteRepository.guardarEstudiante(estudiante);
+            logger.info("Estudiante registrado: {} {} {}", estudiante.getNombre(), estudiante.getPrimer_apellido(),
+                    estudiante.getSegundo_apellido());
+            return "Estudiante registrado con éxito: " + estudiante.getNombre() + " " + estudiante.getPrimer_apellido()
+                    + " " + estudiante.getSegundo_apellido();
+        } catch (Exception e) {
+            logger.error("Error registrando estudiante: {}", estudiante, e);
+            throw new RuntimeException("No se pudo registrar el estudiante", e);
+        }
     }
 
     public String registerSubject(estudiantes_materias estudiante_materias) {
-
-        materiaRepository.save(estudiante_materias);
-
-        return "Materia registrada con exito: " + estudiante_materias.getNombre_materia() + " "
-                + estudiante_materias.getTipo_materia();
+        try {
+            materiaRepository.guardarEstudianteMateria(estudiante_materias);
+            logger.info("Materia registrada: {} {}", estudiante_materias.getNombre_materia(),
+                    estudiante_materias.getTipo_materia());
+            return "Materia registrada con éxito: " + estudiante_materias.getNombre_materia() + " "
+                    + estudiante_materias.getTipo_materia();
+        } catch (Exception e) {
+            logger.error("Error registrando materia: {}", estudiante_materias, e);
+            throw new RuntimeException("No se pudo registrar la materia", e);
+        }
     }
 
 }
