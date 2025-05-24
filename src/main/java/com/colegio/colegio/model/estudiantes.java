@@ -17,6 +17,8 @@ public class estudiantes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Id
+    private Integer cedula;
     private String nombre;
     private String primer_apellido;
     private String segundo_apellido;

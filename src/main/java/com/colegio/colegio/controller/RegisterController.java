@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +33,7 @@ public class RegisterController {
 
                 estudiantes estudiante = new estudiantes(
                                 null,
+                                (Integer) estudianteData.get("cedula"),
                                 (String) estudianteData.get("nombre"),
                                 (String) estudianteData.get("primer_apellido"),
                                 (String) estudianteData.get("segundo_apellido"),
@@ -41,12 +41,15 @@ public class RegisterController {
                                 (String) estudianteData.get("estado"),
                                 (String) estudianteData.get("fecha_nacimiento"));
 
+                String estadoMateria = ((Integer) materiaData.get("nota")) >= 70 ? "Aprobado" : "Reprobado";
+
                 estudiantes_materias materia = new estudiantes_materias(
                                 null,
-                                (Integer) materiaData.get("id_estudiante"),
+                                Integer.parseInt(materiaData.get("cedula_estudiante").toString()),
                                 (String) materiaData.get("nombre_materia"),
                                 (String) materiaData.get("tipo_materia"),
-                                (Integer) materiaData.get("nota"));
+                                (Integer) materiaData.get("nota"),
+                                estadoMateria);
 
                 registerService.registerStudent(estudiante);
                 registerService.registerSubject(materia);

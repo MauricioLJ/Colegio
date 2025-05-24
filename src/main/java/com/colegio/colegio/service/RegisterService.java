@@ -26,26 +26,48 @@ public class RegisterService {
 
     public String registerStudent(estudiantes estudiante) {
         try {
-            estudianteRepository.guardarEstudiante(estudiante);
-            logger.info("Estudiante registrado: {} {} {}", estudiante.getNombre(), estudiante.getPrimer_apellido(),
-                    estudiante.getSegundo_apellido());
-            return "Estudiante registrado con éxito: " + estudiante.getNombre() + " " + estudiante.getPrimer_apellido()
-                    + " " + estudiante.getSegundo_apellido();
+            boolean existe = estudianteRepository.existeEstudiantePorCedula(estudiante.getCedula());
+
+            if (!existe) {
+                estudianteRepository.guardarEstudiante(estudiante);
+                logger.info("Estudiante registrado: {} {} {}", estudiante.getNombre(), estudiante.getPrimer_apellido(),
+                        estudiante.getSegundo_apellido());
+                return "Estudiante registrado con éxito: " + estudiante.getNombre() + " "
+                        + estudiante.getPrimer_apellido() + " " + estudiante.getSegundo_apellido();
+            } else {
+                logger.info("Estudiante con cédula {} ya existe. No se insertó nuevamente.", estudiante.getCedula());
+                return "Estudiante ya registrado previamente.";
+            }
+
         } catch (Exception e) {
             logger.error("Error registrando estudiante: {}", estudiante, e);
             throw new RuntimeException("No se pudo registrar el estudiante", e);
         }
     }
 
-    public String registerSubject(estudiantes_materias estudiante_materias) {
+    public String registerSubject(estudiantes_materias estudianteMateria) {
         try {
-            materiaRepository.guardarEstudianteMateria(estudiante_materias);
-            logger.info("Materia registrada: {} {}", estudiante_materias.getNombre_materia(),
-                    estudiante_materias.getTipo_materia());
-            return "Materia registrada con éxito: " + estudiante_materias.getNombre_materia() + " "
-                    + estudiante_materias.getTipo_materia();
+            // Registrar la materia nueva
+            materiaRepository.guardarEstudianteMateria(estudianteMateria);
+
+            // Obtener nuevo promedio
+            Double promedio = materiaRepository.obtenerPromedioPorCedula(estudianteMateria.getCedula_estudiante());
+
+            if (promedio != null) {
+                // Determinar estado según el promedio
+                String nuevoEstado = promedio >= 70 ? "Aprobado" : "Reprobado";
+
+                // Actualizar promedio y estado
+                estudianteRepository.actualizarNotaYEstado(estudianteMateria.getCedula_estudiante(), promedio,
+                        nuevoEstado);
+            }
+
+            logger.info("Materia registrada: {} {}", estudianteMateria.getNombre_materia(),
+                    estudianteMateria.getTipo_materia());
+            return "Materia registrada con éxito: " + estudianteMateria.getNombre_materia() + " "
+                    + estudianteMateria.getTipo_materia();
         } catch (Exception e) {
-            logger.error("Error registrando materia: {}", estudiante_materias, e);
+            logger.error("Error registrando materia: {}", estudianteMateria, e);
             throw new RuntimeException("No se pudo registrar la materia", e);
         }
     }

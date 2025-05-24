@@ -17,8 +17,9 @@ public class estudiantes_materias {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_estudiantemateria;
-    private Integer id_estudiante;
+    private Integer cedula_estudiante;
     private String nombre_materia;
     private String tipo_materia;
     private Integer nota;
+    private String estado;
 }
